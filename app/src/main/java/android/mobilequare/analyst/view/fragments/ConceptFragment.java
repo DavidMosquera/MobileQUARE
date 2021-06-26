@@ -2,9 +2,12 @@ package android.mobilequare.analyst.view.fragments; //$A
 import android.app.AlertDialog; //$A
 import android.content.DialogInterface; //$A
 import android.mobilequare.analyst.R; //$A
+import android.mobilequare.analyst.controller.AsksQuestionController;
 import android.mobilequare.analyst.model.po.Actor;//$A
 import android.mobilequare.analyst.model.po.Concept;//$A
 import android.mobilequare.analyst.model.po.Function;//$A
+import android.mobilequare.analyst.model.po.Project;//$A
+import android.mobilequare.analyst.view.AsksQuestionView;//$A
 import android.os.Bundle;//$A
 import android.view.LayoutInflater;//$A
 import android.view.View;//$A
@@ -19,37 +22,42 @@ public class ConceptFragment extends Fragment {//$A
     private Actor actor;//$A
     private android.mobilequare.analyst.model.po.Object object;//$A
     private int type;//$A
-    private String project;//$A
+    private Project project;//$A
     private AlertDialog askDialog;//$A
     private int selected;//$A
+    private AsksQuestionController asksQuestionController; //$A
     public ConceptFragment() {//$A
     }//$A
-    public static ConceptFragment newInstance(String project){//$A
+    public static ConceptFragment newInstance(Project project, AsksQuestionController asksQuestionController){//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setType(0);//$A
+        fragment.setAsksQuestionController(asksQuestionController); //$A
         fragment.setProject(project);//$A
         return fragment;//$A
     }//$A
-    public static ConceptFragment newInstance(Function function, Actor actor , android.mobilequare.analyst.model.po.Object object, String project){//$A
+    public static ConceptFragment newInstance(Function function, Actor actor , android.mobilequare.analyst.model.po.Object object, Project project, AsksQuestionController asksQuestionController){//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setFunction(function);//$A
+        fragment.setAsksQuestionController(asksQuestionController); //$A
         fragment.setType(1);//$A
         fragment.setProject(project);//$A
         fragment.setActor(actor);//$A
         fragment.setObject(object);//$A
         return fragment;//$A
     }//$A
-    public static ConceptFragment newInstance(Function function, String project){//$A
+    public static ConceptFragment newInstance(Function function, Project project, AsksQuestionController asksQuestionController){//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setFunction(function);//$A
         fragment.setType(1);//$A
+        fragment.setAsksQuestionController(asksQuestionController); //$A
         fragment.setProject(project);//$A
         return fragment;//$A
     }//$A
-    public static ConceptFragment newInstance(Concept concept, String project) {//$A
+    public static ConceptFragment newInstance(Concept concept, Project project, AsksQuestionController asksQuestionController) {//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setConcept(concept);//$A
         fragment.setType(2);//$A
+        fragment.setAsksQuestionController(asksQuestionController); //$A
         fragment.setProject(project);//$A
         return fragment;//$A
     }//$A
@@ -77,7 +85,7 @@ public class ConceptFragment extends Fragment {//$A
             ((TextView)rootView.findViewById(R.id.concept_name_text_view)).setText(concept.getName()); //$A
         }else{//$A
             imageView.setImageResource(R.drawable.ic_configuration);//$A
-            ((TextView)rootView.findViewById(R.id.concept_name_text_view)).setText(project); //$A
+            ((TextView)rootView.findViewById(R.id.concept_name_text_view)).setText(project.getName()); //$A
         }//$A
         return rootView;//$A
     }//$A
@@ -92,9 +100,10 @@ public class ConceptFragment extends Fragment {//$A
     public void setType(int type){//$A
         this.type = type;//$A
     }//$A
-    public void setProject(String project){//$A
+    public void setProject(Project project){//$A
         this.project = project;//$A
     }//$A
+    public void setAsksQuestionController(AsksQuestionController asksQuestionController){ this.asksQuestionController = asksQuestionController; } //$A
     public void askConfirm(){//$A
         askDialog.cancel();//$A
         String questionType = "";//$A
@@ -103,7 +112,7 @@ public class ConceptFragment extends Fragment {//$A
             else if(this.type == 1){if (this.selected == 0 || this.selected == 1) questionType = "Which are the X's attributes?"; else questionType = "Which are the X's functions?";}//$A
             else{if(this.selected == 0) questionType = "Which are the X's attributes?"; else questionType = "Which are the X's functions?";}//$A
         }//$A
-        System.out.println(questionType);//$A
+        this.asksQuestionController.asksQuestion(((AsksQuestionView) getActivity()), questionType, concept, function, object);System.out.println(questionType);//$A
     }//$A
     public void askCancel(){//$A
         askDialog.cancel();//$A

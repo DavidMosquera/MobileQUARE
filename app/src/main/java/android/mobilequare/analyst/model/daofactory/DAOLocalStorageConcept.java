@@ -35,6 +35,7 @@ public class DAOLocalStorageConcept extends DAOConcept {
 					concept = new Concept();
 					concept.set_Id(cursor.getString(cursor.getColumnIndex("_ID")));
 					concept.setName(cursor.getString(cursor.getColumnIndex("NAME")));
+					concept.setIdentification(cursor.getString(cursor.getColumnIndex("IDENTIFICATION")));
 					concept.set_idDiscourse(cursor.getString(cursor.getColumnIndex("DISCOURSE_ID")));
 					conceptList.add(concept);
 				} while (cursor.moveToNext());
@@ -68,6 +69,7 @@ public class DAOLocalStorageConcept extends DAOConcept {
 			conceptValues.put("_ID", concept.get_Id());
 			conceptValues.put("NAME", concept.getName());
 			conceptValues.put("DISCOURSE_ID", concept.get_idDiscourse());
+			conceptValues.put("IDENTIFICATION", concept.getIdentification());
 			Uri uri = contentResolver.insert(LocalStorageContentProvider.CONCEPT_URI, conceptValues);
 		} catch (Exception e) {
 			throw new StorageException();
@@ -85,6 +87,7 @@ public class DAOLocalStorageConcept extends DAOConcept {
 		try {
 			ContentValues conceptValues = new ContentValues();
 			conceptValues.put("NAME", concept.getName());
+			conceptValues.put("IDENTIFICATION", concept.getIdentification());
 			conceptValues.put("DISCOURSE_ID", concept.get_idDiscourse());
 			contentResolver.update(LocalStorageContentProvider.CONCEPT_URI, conceptValues,
 					"_id = \"" + concept.get_Id() + "\"", null);

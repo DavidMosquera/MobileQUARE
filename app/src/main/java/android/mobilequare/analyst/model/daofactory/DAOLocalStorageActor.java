@@ -35,6 +35,8 @@ public class DAOLocalStorageActor extends DAOActor {
 					actor = new Actor();
 					actor.set_Id(cursor.getString(cursor.getColumnIndex("_ID")));
 					actor.setName(cursor.getString(cursor.getColumnIndex("NAME")));
+					actor.setIdentification(cursor.getString(cursor.getColumnIndex("IDENTIFICATION")));
+					actor.set_idDiscourse(cursor.getString(cursor.getColumnIndex("DISCOURSE_ID")));
 					actorList.add(actor);
 				} while (cursor.moveToNext());
 			}
@@ -65,6 +67,8 @@ public class DAOLocalStorageActor extends DAOActor {
 			ContentValues actorValues = new ContentValues();
 			actorValues.put("_ID", actor.get_Id());
 			actorValues.put("NAME", actor.getName());
+			actorValues.put("DISCOURSE_ID", actor.get_idDiscourse());
+			actorValues.put("IDENTIFICATION", actor.getIdentification());
 			Uri uri = contentResolver.insert(LocalStorageContentProvider.ACTOR_URI, actorValues);
 		} catch (Exception e) {
 			throw new StorageException();
@@ -81,6 +85,8 @@ public class DAOLocalStorageActor extends DAOActor {
 		try {
 			ContentValues actorValues = new ContentValues();
 			actorValues.put("NAME", actor.getName());
+			actorValues.put("DISCOURSE_ID", actor.get_idDiscourse());
+			actorValues.put("IDENTIFICATION", actor.getIdentification());
 			contentResolver.update(LocalStorageContentProvider.ACTOR_URI, actorValues,
 					"_id = \"" + actor.get_Id() + "\"", null);
 		} catch (Exception e) {

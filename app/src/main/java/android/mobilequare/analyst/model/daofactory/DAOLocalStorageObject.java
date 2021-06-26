@@ -35,6 +35,8 @@ public class DAOLocalStorageObject extends DAOObject {
 					object = new Object();
 					object.set_Id(cursor.getString(cursor.getColumnIndex("_ID")));
 					object.setName(cursor.getString(cursor.getColumnIndex("NAME")));
+					object.setIdentification(cursor.getString(cursor.getColumnIndex("IDENTIFICATION")));
+					object.set_idDiscourse(cursor.getString(cursor.getColumnIndex("DISCOURSE_ID")));
 					objectList.add(object);
 				} while (cursor.moveToNext());
 			}
@@ -66,6 +68,8 @@ public class DAOLocalStorageObject extends DAOObject {
 			ContentValues objectValues = new ContentValues();
 			objectValues.put("_ID", object.get_Id());
 			objectValues.put("NAME", object.getName());
+			objectValues.put("DISCOURSE_ID", object.get_idDiscourse());
+			objectValues.put("IDENTIFICATION", object.getIdentification());
 			Uri uri = contentResolver.insert(LocalStorageContentProvider.OBJECT_URI, objectValues);
 		} catch (Exception e) {
 			throw new StorageException();
@@ -82,6 +86,8 @@ public class DAOLocalStorageObject extends DAOObject {
 		try {
 			ContentValues objectValues = new ContentValues();
 			objectValues.put("NAME", object.getName());
+			objectValues.put("DISCOURSE_ID", object.get_idDiscourse());
+			objectValues.put("IDENTIFICATION", object.getIdentification());
 			contentResolver.update(LocalStorageContentProvider.OBJECT_URI, objectValues,
 					"_id = \"" + object.get_Id() + "\"", null);
 		} catch (Exception e) {

@@ -2,13 +2,34 @@ package android.mobilequare.analyst.controller;
 import android.mobilequare.analyst.command.Command;
 import android.content.Context;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.lang.Object;
+import java.net.HttpURLConnection;//$A
+import java.net.MalformedURLException;
+import java.net.URL;//$A
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import android.mobilequare.analyst.exception.*;
 import android.mobilequare.analyst.view.ProvidesDiscourseView;
 import android.mobilequare.analyst.model.dao.*;
 import android.mobilequare.analyst.model.factory.*;
 import android.mobilequare.analyst.model.po.*;
+import android.os.AsyncTask; //$A
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.JsonValue;
 
 public class ProvidesDiscourseController implements Command {
 	private Discourse discourse;
@@ -53,35 +74,128 @@ public class ProvidesDiscourseController implements Command {
 		//LOCAL VARIABLES 
 		String concatenatedContent;
 		//"ANALYST PROVIDES DISCOURSE" SPECIFICATION
-		try{  
+		try{
 			discourse.set_idProject(viewProject.get_Id());   
 			discourse.setContent(viewContent);  
-			concatenatedContent = (discourse.getContent());  
-			concatenatedContent = ((concatenatedContent) + (discourse.getContent()));  
-			(null);  
-			concept.setIdentification((project.getName()) + (concept.getName()));   
-			daoActor.insertActor(actor, false);   
-			concept.setIdentification((project.getName()) + (concept.getName()));   
-			daoObject.insertObject(object, false);    
-			daoFunction.insertFunction(function, false);   
-			concept.setIdentification((project.getName()) + (concept.getName()));   
-			daoContainerConcept.insertContainerConcept(containerConcept, false);   
-			concept.setIdentification((project.getName()) + (concept.getName()));   
-			daoAttribute.insertAttribute(attribute, false);    
-			daoAttributeRelationship.insertAttributeRelationship(attributeRelationship, false);    
-			daoDiscourse.insertDiscourse(discourse, false);                  
-			providesDiscourseView.providesDiscourseSucceeds();
+			concatenatedContent = (discourse.getContent());
+			for(Discourse discourseObject : daoDiscourse.listDiscourse("PROJECT_ID = \"" + viewProject.get_Id()+ "\"")){//$A
+				concatenatedContent = ((concatenatedContent) + (discourseObject.getContent())); //$E
+			}//$A
+			//$D (null);
+			String finalConcatenatedContent = concatenatedContent;//$A
+			Project finalViewProject = viewProject; //$A
+			Toast.makeText(providesDiscourseView, "Providing discourse", Toast.LENGTH_SHORT).show(); //$A
+			providesDiscourseView.deactivateButton(); //$A
+			ExecutorService executor = Executors.newSingleThreadExecutor(); //$A
+			Handler handler = new Handler(Looper.getMainLooper()); //$A
+			executor.execute(new Runnable() { //$A
+				@Override//$A
+				public void run() {//$A
+					try {//$A
+						URL quareURL = new URL("http://192.168.0.7:5000/QUARE");//$A
+						HttpURLConnection myConnection = (HttpURLConnection) quareURL.openConnection();//$A
+						String text = finalConcatenatedContent.replace("\n", "").replace("\r", "");//$A
+						String jsonBody = "{\"text\":\""+ text +"\"}";//$A
+						myConnection.setRequestProperty("Accept", "application/json");//$A
+						myConnection.setRequestProperty("Content-Type", "application/json; utf-8");//$A
+						myConnection.setRequestMethod("POST");//$A
+						myConnection.setDoOutput(true);//$A
+						try(OutputStream os = myConnection.getOutputStream()) {//$A
+							byte[] input = jsonBody.getBytes("utf-8");//$A
+							os.write(input, 0, input.length);//$A
+						}//$A
+						if(myConnection.getResponseCode() == 200) {//$A
+							HashMap<String, Concept> conceptHashMap = new HashMap<>();//$A
+							JsonReader jsonReader = Json.createReader(new InputStreamReader(myConnection.getInputStream(), "UTF-8"));//$A
+							JsonObject jsonObject = jsonReader.readObject();//$A
+							JsonObject concepts = jsonObject.getJsonObject("concepts");//$A
+							JsonObject concept;//$A
+							jsonReader.close();//$A
+							Concept conceptStorage;//$A
+							for (String conceptName : concepts.keySet()){//$A
+								conceptStorage = new Concept();//$A
+								conceptStorage.set_idDiscourse(discourse.getId());//$A
+								conceptStorage.setIdentification((finalViewProject.getName()) + (conceptName)); //$E
+								conceptStorage.setName(conceptName); //$A
+								concept = concepts.getJsonObject(conceptName); //$A
+								if(daoConcept.listConcept("IDENTIFICATION = \""+ conceptStorage.getIdentification() + "\"").size()==0) daoConcept.insertConcept(conceptStorage, false); //$A
+								if (concept.getString("type").compareTo("ACTOR")==0){
+									if(daoActor.listActor("IDENTIFICATION = \""+ conceptStorage.getIdentification() + "\"").size()==0) daoActor.insertActor(new Actor(conceptStorage), false); //$E
+								} //$A
+								conceptHashMap.put(conceptName, conceptStorage);//$A
+							}//$A
+							JsonObject functions = jsonObject.getJsonObject("functions");//$A
+							JsonObject function;//$A
+							Function functionStorage;//$A
+							for (String functionId : functions.keySet()){//$A
+								function = functions.getJsonObject(functionId);//$A
+								functionStorage = new Function();//$A
+								if(conceptHashMap.containsKey(function.getString("actor"))&&conceptHashMap.containsKey(function.getString("dir_object"))){//$A
+									functionStorage.set_idActor(conceptHashMap.get(function.getString("actor")).get_Id());//$A
+									functionStorage.set_idObject(conceptHashMap.get(function.getString("dir_object")).get_Id());//$A
+									if (daoObject.listObject("IDENTIFICATION = \""+conceptHashMap.get(function.getString("dir_object")).getIdentification()+"\"").size()==0) daoObject.insertObject(new android.mobilequare.analyst.model.po.Object(conceptHashMap.get(function.getString("dir_object"))), false);//$A
+									functionStorage.setActionVerb(function.getString("action_verb")); //$A
+									if (daoFunction.listFunction("ACTOR_ID = \""+functionStorage.get_idActor()+"\" AND OBJECT_ID = \""+functionStorage.get_idObject()+"\" AND ACTIONVERB = \""+functionStorage.getActionVerb()+"\"").size()==0) daoFunction.insertFunction(functionStorage, false); //$E
+								}//$A
+							}//$A
+							boolean firstInsertion;//$A
+							AttributeRelationship attributeRelationship;//$A
+							for (String conceptName : concepts.keySet()){//$A
+								concept = concepts.getJsonObject(conceptName);//$A
+								firstInsertion = true;//$A
+								for (JsonValue jsonValue : concept.getJsonArray("attributes")) {//$A
+									attributeRelationship = new AttributeRelationship();//$A
+									attributeRelationship.set_idContainerConcept(conceptHashMap.get(conceptName).get_Id());//$A
+									attributeRelationship.set_idAttribute(conceptHashMap.get(jsonValue.toString().replace("\"","")).get_Id());//$A
+									if (firstInsertion){//$A
+										if(daoContainerConcept.listContainerConcept("IDENTIFICATION = \""+conceptHashMap.get(conceptName).getIdentification()+"\"").size() == 0) daoContainerConcept.insertContainerConcept(new ContainerConcept(conceptHashMap.get(conceptName)), false); //$E
+									}//$A
+									if(daoAttribute.listAttribute("IDENTIFICATION = \""+conceptHashMap.get(jsonValue.toString().replace("\"","")).getIdentification()+"\"").size() == 0) daoAttribute.insertAttribute(new Attribute(conceptHashMap.get(jsonValue.toString().replace("\"",""))), false); //$E
+									if(daoAttributeRelationship.listAttributeRelationship("ATTRIBUTE_ID = \""+attributeRelationship.get_idAttribute()+"\" AND CONTAINERCONCEPT_ID = \""+attributeRelationship.get_idContainerConcept()+"\"" ).size() == 0) daoAttributeRelationship.insertAttributeRelationship(attributeRelationship, false); //$E
+								}//$A
+							}//$A
+							daoDiscourse.insertDiscourse(discourse, false);
+							handler.post(new Runnable() {//$A
+								@Override//$A
+								public void run() {//$A
+									providesDiscourseView.activateButton(); //$A
+									providesDiscourseView.providesDiscourseSucceeds();//$A
+								}//$A
+							});//$A
+						}else{//$A
+							handler.post(new Runnable() {//$A
+								@Override//$A
+								public void run() {//$A
+									providesDiscourseView.activateButton(); //$A
+									providesDiscourseView.providesDiscourseFails("An error has occurred establishing connection with the server");//$A
+								}//$A
+							});//$A
+						}//$A
+					} catch ( IOException  | ConstraintCheckingException | StorageException e) {//$A
+						handler.post(new Runnable() {//$A
+							@Override//$A
+							public void run() {//$A
+								providesDiscourseView.activateButton(); //$A
+								providesDiscourseView.providesDiscourseFails("An error has occurred during providing discourse: " + e.getMessage() );//$A
+							}//$A
+						});//$A
+					}//$A
+				}//$A
+			});//$A
+			//$Dconcept.setIdentification((project.getName()) + (concept.getName()));
+			//$Dconcept.setIdentification((project.getName()) + (concept.getName()));
+			//$Dconcept.setIdentification((project.getName()) + (concept.getName()));
 		}
-		catch (ConstraintCheckingException e){
-			try{this.undo();} catch(Exception e1){}
-			providesDiscourseView.providesDiscourseFails(e.getMessage());
-		}
+		//$Dcatch (ConstraintCheckingException e){
+			//$Dtry{this.undo();} catch(Exception e1){}
+			//$DprovidesDiscourseView.providesDiscourseFails(e.getMessage());
+		//$D}
 		catch (StorageException e){
 			try{this.undo();} catch(Exception e1){}
+			providesDiscourseView.activateButton(); //$A
 			providesDiscourseView.providesDiscourseFails(e.getMessage());
 		}
 	}
-
 	public List<Project> listsProject(ProvidesDiscourseView providesDiscourseView, String query) {
 		try {
 			List<Project> projectList = daoProject.listProject(query);
@@ -176,13 +290,13 @@ public class ProvidesDiscourseController implements Command {
 			daoConcept.deleteConcept(concept, true);
 		}
 		//UNDO STATEMENTS FOR OBJECT OBJECTS
-		for (Object object : daoObject.getObjectDeletedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectDeletedList()) {//$E
 			daoObject.insertObject(object, true);
 		}
-		for (Object object : daoObject.getObjectEditedReversedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectEditedReversedList()) {//$E
 			daoObject.editObject(object, true);
 		}
-		for (Object object : daoObject.getObjectInsertedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectInsertedList()) {//$E
 			daoObject.deleteObject(object, true);
 		}
 	}
@@ -271,13 +385,13 @@ public class ProvidesDiscourseController implements Command {
 			daoConcept.deleteConcept(concept, true);
 		}
 		//REDO STATEMENTS FOR OBJECT OBJECTS
-		for (Object object : daoObject.getObjectInsertedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectInsertedList()) {//$E
 			daoObject.insertObject(object, true);
 		}
-		for (Object object : daoObject.getObjectEditedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectEditedList()) {//$E
 			daoObject.editObject(object, true);
 		}
-		for (Object object : daoObject.getObjectDeletedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectDeletedList()) {//$E
 			daoObject.deleteObject(object, true);
 		}
 	}

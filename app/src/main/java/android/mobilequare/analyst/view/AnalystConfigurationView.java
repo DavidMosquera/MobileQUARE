@@ -91,8 +91,8 @@ public class AnalystConfigurationView extends AppCompatActivity {
 				.add(fragmentContainer.getId(), analystEstablishesQuestionSetConfirmationMessageFragment).commit();
 		getSupportFragmentManager().beginTransaction()
 				.add(fragmentContainer.getId(), analystProvidesDiscourseConfirmationMessageFragment).commit();
-		getSupportFragmentManager().beginTransaction()
-				.add(fragmentContainer.getId(), analystAsksQuestionConfirmationMessageFragment).commit();
+		//$D getSupportFragmentManager().beginTransaction()
+		//$D .add(fragmentContainer.getId(), analystAsksQuestionConfirmationMessageFragment).commit();
 		getSupportFragmentManager().beginTransaction()
 				.add(fragmentContainer.getId(), new LabelFragment().create("Undo/Redo Notifications")).commit();
 		getSupportFragmentManager().beginTransaction()
@@ -101,8 +101,8 @@ public class AnalystConfigurationView extends AppCompatActivity {
 				.add(fragmentContainer.getId(), analystEstablishesQuestionSetUndoRedoNotificationFragment).commit();
 		getSupportFragmentManager().beginTransaction()
 				.add(fragmentContainer.getId(), analystProvidesDiscourseUndoRedoNotificationFragment).commit();
-		getSupportFragmentManager().beginTransaction()
-				.add(fragmentContainer.getId(), analystAsksQuestionUndoRedoNotificationFragment).commit();
+		//$D getSupportFragmentManager().beginTransaction()
+		//$D .add(fragmentContainer.getId(), analystAsksQuestionUndoRedoNotificationFragment).commit();
 		getSupportFragmentManager().beginTransaction()
 				.add(fragmentContainer.getId(), new LabelFragment().create("Other Configurations")).commit();
 		getSupportFragmentManager().beginTransaction().add(fragmentContainer.getId(), leftHandViewFragment).commit();

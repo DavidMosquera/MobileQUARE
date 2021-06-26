@@ -44,7 +44,7 @@ public class EstablishesQuestionSetView extends AppCompatActivity {
 					}
 				}).create();
 		projectListFragment = new ObjectListInsertFragment().create(
-				((List<ClassConcept>) (Object) establishesQuestionSetController.listsProject(this, "")), "Project");
+				((List<ClassConcept>) (java.lang.Object) establishesQuestionSetController.listsProject(this, "")), "Project"); //$E
 		questionSetTitleInsertFragment = new TextTypeInsertFragment().create("Title *");
 		LinearLayout fragmentContainer = (LinearLayout) findViewById(
 				R.id.establishes_questionset_fragment_linear_layout);

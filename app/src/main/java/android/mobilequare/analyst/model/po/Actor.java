@@ -9,7 +9,13 @@ public class Actor extends Concept {
 	//COMPLEX ATTRIBUTES 
 	private List<Function> functionList;
 	//FOREING KEYS 
-	//CONSTRUCTOR 
+	//CONSTRUCTOR
+	public Actor (Concept concept){//$A
+		super();//$A
+		this.setName(concept.getName());//$A
+		this.setIdentification(concept.getIdentification());//$A
+		this.set_idDiscourse(concept.get_idDiscourse());//$A
+	}//$A
 	public Actor() {
 		super();
 		this.functionList = new ArrayList<Function>();

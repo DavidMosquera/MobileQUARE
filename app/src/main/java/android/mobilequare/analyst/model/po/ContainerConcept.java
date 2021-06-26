@@ -9,7 +9,13 @@ public class ContainerConcept extends Concept {
 	//COMPLEX ATTRIBUTES 
 	private List<AttributeRelationship> attributeRelationshipList;
 	//FOREING KEYS 
-	//CONSTRUCTOR 
+	//CONSTRUCTOR
+	public ContainerConcept (Concept concept){//$A
+		super();//$A
+		this.setName(concept.getName());//$A
+		this.setIdentification(concept.getIdentification());//$A
+		this.set_idDiscourse(concept.get_idDiscourse());//$A
+	}//$A
 	public ContainerConcept() {
 		super();
 		this.attributeRelationshipList = new ArrayList<AttributeRelationship>();

@@ -35,6 +35,8 @@ public class DAOLocalStorageContainerConcept extends DAOContainerConcept {
 					containerConcept = new ContainerConcept();
 					containerConcept.set_Id(cursor.getString(cursor.getColumnIndex("_ID")));
 					containerConcept.setName(cursor.getString(cursor.getColumnIndex("NAME")));
+					containerConcept.setIdentification(cursor.getString(cursor.getColumnIndex("IDENTIFICATION")));
+					containerConcept.set_idDiscourse(cursor.getString(cursor.getColumnIndex("DISCOURSE_ID")));
 					containerConceptList.add(containerConcept);
 				} while (cursor.moveToNext());
 			}
@@ -68,6 +70,8 @@ public class DAOLocalStorageContainerConcept extends DAOContainerConcept {
 			ContentValues containerConceptValues = new ContentValues();
 			containerConceptValues.put("_ID", containerConcept.get_Id());
 			containerConceptValues.put("NAME", containerConcept.getName());
+			containerConceptValues.put("DISCOURSE_ID", containerConcept.get_idDiscourse());
+			containerConceptValues.put("IDENTIFICATION", containerConcept.getIdentification());
 			Uri uri = contentResolver.insert(LocalStorageContentProvider.CONTAINERCONCEPT_URI, containerConceptValues);
 		} catch (Exception e) {
 			throw new StorageException();
@@ -86,6 +90,8 @@ public class DAOLocalStorageContainerConcept extends DAOContainerConcept {
 		try {
 			ContentValues containerConceptValues = new ContentValues();
 			containerConceptValues.put("NAME", containerConcept.getName());
+			containerConceptValues.put("IDENTIFICATION", containerConcept.getIdentification());
+			containerConceptValues.put("DISCOURSE_ID", containerConcept.get_idDiscourse());
 			contentResolver.update(LocalStorageContentProvider.CONTAINERCONCEPT_URI, containerConceptValues,
 					"_id = \"" + containerConcept.get_Id() + "\"", null);
 		} catch (Exception e) {

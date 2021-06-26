@@ -9,7 +9,13 @@ public class Object extends Concept {
 	//COMPLEX ATTRIBUTES 
 	private List<Function> functionList;
 	//FOREING KEYS 
-	//CONSTRUCTOR 
+	//CONSTRUCTOR
+	public Object (Concept concept){//$A
+		super();//$A
+		this.setName(concept.getName());//$A
+		this.setIdentification(concept.getIdentification());//$A
+		this.set_idDiscourse(concept.get_idDiscourse());//$A
+	}//$A
 	public Object() {
 		super();
 		this.functionList = new ArrayList<Function>();

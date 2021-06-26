@@ -18,7 +18,7 @@ import java.io.IOException;//$A
 import java.net.MalformedURLException;//$A
 public class DocumentFragment extends Fragment implements View.OnTouchListener {//$A
     private String path;//$A
-    private String text;//$A
+    private String text = "";//$A
     private String title;//$A
     private EditText textView;//$A
     private TextView textViewError;//$A
@@ -81,5 +81,9 @@ public class DocumentFragment extends Fragment implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {//$A
         if(MotionEvent.ACTION_UP == event.getAction()) getDocument.launch("application/pdf");//$A
         return false;//$A
+    }//$A
+    public void newInfo(String info) {//$A
+        textViewError.setText(info);//$A
+        textViewError.setVisibility(View.VISIBLE);//$A
     }//$A
 }//$A

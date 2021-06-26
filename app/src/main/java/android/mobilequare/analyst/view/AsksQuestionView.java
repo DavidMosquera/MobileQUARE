@@ -14,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.view.View;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 public class AsksQuestionView extends AppCompatActivity {
 	private AsksQuestionController asksQuestionController;
@@ -43,15 +45,15 @@ public class AsksQuestionView extends AppCompatActivity {
 					}
 				}).create();
 		questionSetListFragment = new ObjectListInsertFragment().create(
-				((List<ClassConcept>) (Object) asksQuestionController.listsQuestionSet(this, "")), "QuestionSet");
-		questionTypeInsertFragment = new PossibleValueListInsertFragment().create("Type *",
-				new ArrayList<>(Arrays.asList("Which are the project's discourse actors? ",
-						"Which are the project's discourse concepts? ", "Which are the X's functions? ",
-						"Which are the X's attributes? ")));
+				((List<ClassConcept>) (java.lang.Object) asksQuestionController.listsQuestionSet(this, "")), "QuestionSet"); //$E
+		//$DquestionTypeInsertFragment = new PossibleValueListInsertFragment().create("Type *",
+		//$D		new ArrayList<>(Arrays.asList("Which are the project's discourse actors? ",
+		//$D				"Which are the project's discourse concepts? ", "Which are the X's functions? ",
+		//$D				"Which are the X's attributes? ")));
 		LinearLayout fragmentContainer = (LinearLayout) findViewById(R.id.asks_question_fragment_linear_layout);
 		getSupportFragmentManager().beginTransaction().add(fragmentContainer.getId(), questionSetListFragment).commit();
-		getSupportFragmentManager().beginTransaction().add(fragmentContainer.getId(), questionTypeInsertFragment)
-				.commit();
+		//$DgetSupportFragmentManager().beginTransaction().add(fragmentContainer.getId(), questionTypeInsertFragment)
+		//$D		.commit();
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,11 +83,19 @@ public class AsksQuestionView extends AppCompatActivity {
 	}
 	public void asksQuestion(View view) {
 		//"ANALYST ASKS QUESTION" VIEW SPECIFICATION
-		if (analystConfigurationController.getAnalystConfiguration().getAsksQuestionConfirmationMessage()) {
-			asksAlert.show();
-		} else {
-			asksQuestionConfirm();
-		}
+		//$Dif (analystConfigurationController.getAnalystConfiguration().getAsksQuestionConfirmationMessage()) {
+		//$D	asksAlert.show();
+		//$D} else {
+		//$D	asksQuestionConfirm();
+		//%D}
+		if(questionSetListFragment.getClassConceptValue()!=null){//$A
+			List<ConceptFragment> conceptFragmentList = new ArrayList<>();//$A
+			conceptFragmentList.add(ConceptFragment.newInstance(asksQuestionController.getProjectFromQuestionSet(((QuestionSet) questionSetListFragment.getClassConceptValue())), asksQuestionController));//$A
+			getSupportFragmentManager().beginTransaction().add(((LinearLayout) findViewById(R.id.asks_question_fragment_linear_layout)).getId(), QuestionFragment.newInstance(conceptFragmentList, "Related project to the selected question set")).commit(); //$A
+			findViewById(R.id.asks_question_button).setEnabled(false);//$A
+		}else{//$A
+			Toast.makeText(this, "Select a question set...", Toast.LENGTH_SHORT).show();//$A
+		}//$A
 	}
 	public void asksQuestionSucceeds() {
 		//BEHAVIOR WHEN "ANALYST ASKS QUESTION" SUCCEEDS
@@ -117,7 +127,7 @@ public class AsksQuestionView extends AppCompatActivity {
 	public void asksQuestionConfirm() {
 		asksAlert.cancel();
 		asksQuestionController.asksQuestion(this, ((QuestionSet) questionSetListFragment.getClassConceptValue()),
-				questionTypeInsertFragment.getValue());
+				questionTypeInsertFragment.getValue(), null, null, null); //$E
 	}
 	public void asksQuestionCancel() {
 		asksAlert.cancel();

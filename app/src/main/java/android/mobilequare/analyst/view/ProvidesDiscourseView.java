@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button; //$A
 import android.widget.LinearLayout;
 import android.view.View;
 import androidx.appcompat.app.AlertDialog;
@@ -20,7 +21,8 @@ public class ProvidesDiscourseView extends AppCompatActivity {
 	private AnalystConfigurationController analystConfigurationController;
 	private AlertDialog providesAlert, helpAlert, providesFailsAlert;
 	private ObjectListInsertFragment projectListFragment;
-	private TextTypeInsertFragment discourseContentInsertFragment;
+	private Button button; //$A
+	private DocumentFragment discourseContentInsertFragment; //$E
 	//OPERATIONS
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,7 @@ public class ProvidesDiscourseView extends AppCompatActivity {
 		setContentView(R.layout.activity_provides_discourse);
 		analystConfigurationController = new AnalystConfigurationController(this);
 		providesDiscourseController = new ProvidesDiscourseController(this);
+		button = findViewById(R.id.provides_discourse_button);
 		if (!analystConfigurationController.getAnalystConfiguration().getLeftHandView()) {
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
@@ -43,8 +46,8 @@ public class ProvidesDiscourseView extends AppCompatActivity {
 					}
 				}).create();
 		projectListFragment = new ObjectListInsertFragment()
-				.create(((List<ClassConcept>) (Object) providesDiscourseController.listsProject(this, "")), "Project");
-		discourseContentInsertFragment = new TextTypeInsertFragment().create("Content *");
+				.create(((List<ClassConcept>) (java.lang.Object) providesDiscourseController.listsProject(this, "")), "Project");//$E
+		discourseContentInsertFragment = DocumentFragment.newInstance("Content *"); //$E
 		LinearLayout fragmentContainer = (LinearLayout) findViewById(R.id.provides_discourse_fragment_linear_layout);
 		getSupportFragmentManager().beginTransaction().add(fragmentContainer.getId(), projectListFragment).commit();
 		getSupportFragmentManager().beginTransaction().add(fragmentContainer.getId(), discourseContentInsertFragment)
@@ -138,6 +141,8 @@ public class ProvidesDiscourseView extends AppCompatActivity {
 				}).create();
 		helpAlert.show();
 	}
+	public void deactivateButton(){button.setEnabled(false);} //$A
+	public void activateButton(){button.setEnabled(true);} //$A
 	public void showHelpAlertOkay() {
 		helpAlert.cancel();
 	}

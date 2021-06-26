@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import android.mobilequare.analyst.exception.*;
+import android.mobilequare.analyst.model.po.Object;
 import android.mobilequare.analyst.view.AsksQuestionView;
 import android.mobilequare.analyst.model.dao.*;
 import android.mobilequare.analyst.model.factory.*;
@@ -22,6 +23,7 @@ public class AsksQuestionController implements Command {
 	private DAOContainerConcept daoContainerConcept;
 	private DAOFunction daoFunction;
 	private DAOObject daoObject;
+	private DAOProject daoProject; //$A
 	//CONSTRUCTOR 
 	public AsksQuestionController(Context context) {
 		question = new Question();
@@ -34,9 +36,10 @@ public class AsksQuestionController implements Command {
 		daoContainerConcept = new LocalStorageFactory(context).getDAOContainerConcept();
 		daoFunction = new LocalStorageFactory(context).getDAOFunction();
 		daoObject = new LocalStorageFactory(context).getDAOObject();
+		daoProject = new LocalStorageFactory(context).getDAOProject(); //$A
 	}
 	//OPERATIONS
-	public void asksQuestion(AsksQuestionView asksQuestionView, QuestionSet viewQuestionSet, String viewTextType) {
+	public void asksQuestion(AsksQuestionView asksQuestionView, QuestionSet viewQuestionSet, String viewTextType, Concept concept, Function function, android.mobilequare.analyst.model.po.Object object) { //$E
 		//TYPE AND MANDATORY CONSTRAINTS 
 		//QUESTIONSET NULLABILITY CHECKING
 		if (viewQuestionSet == null) {
@@ -51,7 +54,7 @@ public class AsksQuestionController implements Command {
 		}
 		String viewType = viewTextType;
 		//LOCAL VARIABLES 
-		Date currentDate;
+		Date currentDate = new Date(); //$E
 		//"ANALYST ASKS QUESTION" SPECIFICATION
 		try {
 			question.set_idQuestionSet(viewQuestionSet.get_Id());
@@ -68,17 +71,17 @@ public class AsksQuestionController implements Command {
 			if ((question.getType()) == ("Which are the X's functions?")) {
 				question.setTitle(((concept.getName()) + ("'s functions?")) + ("Which are the "));
 				question.setAnswer(
-						(question.getAnswer()) + ((function.getActionVerb()) + ((concept.getName()) + (", "))));
+						(question.getAnswer()) + ((function.getActionVerb()) + ((object.getName()) + (", ")))); //$E
 			}
 			if ((question.getType()) == ("Which are the X's attributes?")) {
 				question.setTitle(("Which are the ") + ((concept.getName()) + ("'s attributes?")));
-				question.setAnswer((question.getAnswer()) == ((concept.getName()) + (", ")));
+				question.setAnswer((question.getAnswer()) + ((concept.getName()) + (", ")));
 			}
 			if ((question.getAnswer()) == ("")) {
 			}
 			daoQuestion.insertQuestion(question, false);
-			questionSet.setAnswerDate(currentDate);
-			daoQuestionSet.editQuestionSet(questionSet, false);
+			viewQuestionSet.setAnswerDate(currentDate); //$E
+			daoQuestionSet.editQuestionSet(viewQuestionSet, false); //$E
 			asksQuestionView.asksQuestionSucceeds();
 		} catch (ConstraintCheckingException e) {
 			try {
@@ -94,7 +97,6 @@ public class AsksQuestionController implements Command {
 			asksQuestionView.asksQuestionFails(e.getMessage());
 		}
 	}
-
 	public List<QuestionSet> listsQuestionSet(AsksQuestionView asksQuestionView, String query) {
 		try {
 			List<QuestionSet> questionSetList = daoQuestionSet.listQuestionSet(query);
@@ -104,6 +106,13 @@ public class AsksQuestionController implements Command {
 			return new ArrayList<QuestionSet>();
 		}
 	}
+	public Project getProjectFromQuestionSet(QuestionSet questionSet) {//$A
+		try {//$A
+			return daoProject.listProject("_ID = \"" + questionSet.get_idProject()+"\"").get(0);//$A
+		} catch (StorageException e) {//$A
+			return null;//$A
+		}//$A
+	}//$A
 	public void undo() throws Exception {
 		//UNDO STATEMENTS FOR QUESTIONSET OBJECTS
 		for (QuestionSet questionSet : daoQuestionSet.getQuestionSetDeletedList()) {
@@ -189,13 +198,13 @@ public class AsksQuestionController implements Command {
 			daoFunction.deleteFunction(function, true);
 		}
 		//UNDO STATEMENTS FOR OBJECT OBJECTS
-		for (Object object : daoObject.getObjectDeletedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectDeletedList()) {//$E
 			daoObject.insertObject(object, true);
 		}
-		for (Object object : daoObject.getObjectEditedReversedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectEditedReversedList()) {//$E
 			daoObject.editObject(object, true);
 		}
-		for (Object object : daoObject.getObjectInsertedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectInsertedList()) {//$E
 			daoObject.deleteObject(object, true);
 		}
 	}
@@ -284,13 +293,13 @@ public class AsksQuestionController implements Command {
 			daoFunction.deleteFunction(function, true);
 		}
 		//REDO STATEMENTS FOR OBJECT OBJECTS
-		for (Object object : daoObject.getObjectInsertedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectInsertedList()) {//$E
 			daoObject.insertObject(object, true);
 		}
-		for (Object object : daoObject.getObjectEditedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectEditedList()) {//$E
 			daoObject.editObject(object, true);
 		}
-		for (Object object : daoObject.getObjectDeletedList()) {
+		for (android.mobilequare.analyst.model.po.Object object : daoObject.getObjectDeletedList()) {//$E
 			daoObject.deleteObject(object, true);
 		}
 	}
