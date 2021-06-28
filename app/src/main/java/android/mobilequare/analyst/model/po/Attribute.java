@@ -13,6 +13,7 @@ public class Attribute extends Concept {
 	public Attribute (Concept concept){//$A
 		super();//$A
 		this.setName(concept.getName());//$A
+		this.set_Id(concept.get_Id());//$A
 		this.setIdentification(concept.getIdentification());//$A
 		this.set_idDiscourse(concept.get_idDiscourse());//$A
 	}//$A

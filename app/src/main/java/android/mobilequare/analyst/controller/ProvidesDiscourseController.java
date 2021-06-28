@@ -94,7 +94,8 @@ public class ProvidesDiscourseController implements Command {
 					try {//$A
 						URL quareURL = new URL("http://192.168.0.7:5000/QUARE");//$A
 						HttpURLConnection myConnection = (HttpURLConnection) quareURL.openConnection();//$A
-						String text = finalConcatenatedContent.replace("\n", "").replace("\r", "");//$A
+						String text = finalConcatenatedContent.replace("\n", "").replace("\r", "").replaceAll("\\p{C}", "").replaceAll("[\\p{Cc}\\p{Cf}\\p{Co}\\p{Cn}]", "").replaceAll("\\p{Sc}", "").replaceAll("\\P{Print}", "").replaceAll("\\\\","");//$A
+						System.out.println(text);
 						String jsonBody = "{\"text\":\""+ text +"\"}";//$A
 						myConnection.setRequestProperty("Accept", "application/json");//$A
 						myConnection.setRequestProperty("Content-Type", "application/json; utf-8");//$A
@@ -114,7 +115,7 @@ public class ProvidesDiscourseController implements Command {
 							Concept conceptStorage;//$A
 							for (String conceptName : concepts.keySet()){//$A
 								conceptStorage = new Concept();//$A
-								conceptStorage.set_idDiscourse(discourse.getId());//$A
+								conceptStorage.set_idDiscourse(discourse.get_Id());//$A
 								conceptStorage.setIdentification((finalViewProject.getName()) + (conceptName)); //$E
 								conceptStorage.setName(conceptName); //$A
 								concept = concepts.getJsonObject(conceptName); //$A

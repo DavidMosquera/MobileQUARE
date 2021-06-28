@@ -129,11 +129,12 @@ public class ProvidesDiscourseView extends AppCompatActivity {
 	public void help() {
 		helpAlert = new AlertDialog.Builder(this)
 				.setMessage("In order to execute Analyst Provides Discourse, follow the next steps: \n"
-						+ "- Select a/an Project from the list. \n" + "- Insert a/an Discourse.Content (String). \n"
-						+ "- Press the button Provide. \n" + "- The Actor will be inserted. \n"
-						+ "- The Object will be inserted. \n" + "- The Function will be inserted. \n"
-						+ "- The ContainerConcept will be inserted. \n" + "- The Attribute will be inserted. \n"
-						+ "- The AttributeRelationship will be inserted. \n" + "- The Discourse will be inserted. \n")
+						+ "- Select a/an Project from the list. \n" + "- Insert a/an Discourse.Content (PDF file). \n" //$E
+						+ "- Press the button Provide. \n"  + "- The Discourse will be inserted. \n")
+				//$D"- The Actor will be inserted. \n"
+				//$D+ "- The Object will be inserted. \n" + "- The Function will be inserted. \n"
+				//$D+ "- The ContainerConcept will be inserted. \n" + "- The Attribute will be inserted. \n"
+				//$D+ "- The AttributeRelationship will be inserted. \n"
 				.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						showHelpAlertOkay();

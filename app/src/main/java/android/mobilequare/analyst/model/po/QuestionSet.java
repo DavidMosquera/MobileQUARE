@@ -1,5 +1,6 @@
 package android.mobilequare.analyst.model.po;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,4 +51,10 @@ public class QuestionSet extends ClassConcept {
 	public void set_idProject(String new_idProject) {
 		this._idProject = new_idProject;
 	}
+	public String toString() {//$A
+		return this.getTitle(); //$A
+	}//$A
+	public String listInfo() {//$A
+		return " "+this.getTitle() + " \n Answer date: " +  (this.getAnswerDate().compareTo(new Date(0)) != 0 ? new SimpleDateFormat("dd/MM/yyyy").format(this.getAnswerDate()) : "Not answered yet."); //$A
+	}//$A
 }

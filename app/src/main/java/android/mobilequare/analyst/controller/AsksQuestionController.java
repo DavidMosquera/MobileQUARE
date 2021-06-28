@@ -5,11 +5,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import android.mobilequare.analyst.exception.*;
-import android.mobilequare.analyst.model.po.Object;
+import android.mobilequare.analyst.model.po.Object; //$A
 import android.mobilequare.analyst.view.AsksQuestionView;
 import android.mobilequare.analyst.model.dao.*;
 import android.mobilequare.analyst.model.factory.*;
 import android.mobilequare.analyst.model.po.*;
+import android.mobilequare.analyst.view.fragments.ConceptFragment; //$A
+import android.mobilequare.analyst.view.fragments.QuestionFragment;
 
 public class AsksQuestionController implements Command {
 	private Question question;
@@ -24,6 +26,7 @@ public class AsksQuestionController implements Command {
 	private DAOFunction daoFunction;
 	private DAOObject daoObject;
 	private DAOProject daoProject; //$A
+	private DAODiscourse daoDiscourse; //$A
 	//CONSTRUCTOR 
 	public AsksQuestionController(Context context) {
 		question = new Question();
@@ -37,11 +40,13 @@ public class AsksQuestionController implements Command {
 		daoFunction = new LocalStorageFactory(context).getDAOFunction();
 		daoObject = new LocalStorageFactory(context).getDAOObject();
 		daoProject = new LocalStorageFactory(context).getDAOProject(); //$A
+		daoDiscourse = new LocalStorageFactory(context).getDAODiscourse(); //$A
 	}
 	//OPERATIONS
-	public void asksQuestion(AsksQuestionView asksQuestionView, QuestionSet viewQuestionSet, String viewTextType, Concept concept, Function function, android.mobilequare.analyst.model.po.Object object) { //$E
+	public void asksQuestion(AsksQuestionView asksQuestionView, QuestionSet viewQuestionSet, String viewTextType, Concept conceptView, String questionTitle) { //$E
 		//TYPE AND MANDATORY CONSTRAINTS 
 		//QUESTIONSET NULLABILITY CHECKING
+		List<ConceptFragment> conceptFragmentList = new ArrayList<>(); //$A
 		if (viewQuestionSet == null) {
 			viewQuestionSet = new QuestionSet();
 			viewQuestionSet.set_Id("");
@@ -57,32 +62,49 @@ public class AsksQuestionController implements Command {
 		Date currentDate = new Date(); //$E
 		//"ANALYST ASKS QUESTION" SPECIFICATION
 		try {
+			question = new Question(); //$A
 			question.set_idQuestionSet(viewQuestionSet.get_Id());
 			question.setType(viewType);
 			question.setAnswer("");
-			if ((question.getType()) == ("Which are the project's discourse actors?")) {
-				question.setTitle("Which are the project's discrourse concepts?");
-				question.setAnswer((question.getAnswer()) + ((concept.getName()) + (", ")));
+			if ((question.getType()).compareTo ("Which are the project's discourse actors?") == 0) { //$E
+				question.setTitle("Which are the project's discourse actors?");
+				for (Discourse discourse : daoDiscourse.listDiscourse("PROJECT_ID = \""+viewQuestionSet.get_idProject()+"\"")){//$A
+					for(Actor concept : daoActor.listActor("DISCOURSE_ID = \""+discourse.get_Id()+"\"")){//$A
+						question.setAnswer((question.getAnswer()) + ((concept.getName()) + (", ")));
+						conceptFragmentList.add(ConceptFragment.newInstance(concept, getProjectFromQuestionSet(viewQuestionSet), this, viewQuestionSet));//$A
+					}//$A
+				}//$A
 			}
-			if ((question.getTitle()) == ("Which are the project's discourse concepts?")) {
-				question.setTitle("Which are the project's discrourse concepts?");
-				question.setAnswer((question.getAnswer()) + ((concept.getName()) + (", ")));
+			if ((question.getType()).compareTo ("Which are the project's discourse concepts?") == 0) { //$E
+				question.setTitle("Which are the project's discourse concepts?");
+				for (Discourse discourse : daoDiscourse.listDiscourse("PROJECT_ID = \""+viewQuestionSet.get_idProject()+"\"")){//$A
+					for(Concept concept : daoConcept.listConcept("DISCOURSE_ID = \""+discourse.get_Id()+"\"")){//$A
+						question.setAnswer((question.getAnswer()) + ((concept.getName()) + (", ")));
+						conceptFragmentList.add(ConceptFragment.newInstance(concept, getProjectFromQuestionSet(viewQuestionSet), this, viewQuestionSet));//$A
+					}//$A
+				}//$A
 			}
-			if ((question.getType()) == ("Which are the X's functions?")) {
-				question.setTitle(((concept.getName()) + ("'s functions?")) + ("Which are the "));
-				question.setAnswer(
-						(question.getAnswer()) + ((function.getActionVerb()) + ((object.getName()) + (", ")))); //$E
+			if ((question.getType()).compareTo ("Which are the X's functions?") == 0) { //$E
+ 				question.setTitle(("Which are the ") + ((conceptView.getName()) + ("'s functions?"))); //$E
+				for (Function function : daoFunction.listFunction("ACTOR_ID = \""+conceptView.get_Id()+"\"")) {//$A
+					question.setAnswer(
+							(question.getAnswer()) + ((function.getActionVerb()) + " " +((daoObject.listObject("_ID = \""+function.get_idObject()+"\"").get(0).getName()) + (", ")))); //$E
+					conceptFragmentList.add(ConceptFragment.newInstance(function, daoActor.listActor("_ID = \""+conceptView.get_Id()+"\"").get(0), ((daoObject.listObject("_ID = \""+function.get_idObject()+"\"").get(0))), getProjectFromQuestionSet(viewQuestionSet), this, viewQuestionSet));//$A
+				}//$A
 			}
-			if ((question.getType()) == ("Which are the X's attributes?")) {
-				question.setTitle(("Which are the ") + ((concept.getName()) + ("'s attributes?")));
-				question.setAnswer((question.getAnswer()) + ((concept.getName()) + (", ")));
-			}
+			if ((question.getType()).compareTo("Which are the X's attributes?") == 0) {//$E
+				question.setTitle(("Which are the ") + ((conceptView.getName()) + ("'s attributes?")));//$E
+				for (AttributeRelationship attributeRelationship : daoAttributeRelationship.listAttributeRelationship("CONTAINERCONCEPT_ID = \""+conceptView.get_Id()+"\"")){ //$A
+					question.setAnswer((question.getAnswer()) + ((daoAttribute.listAttribute("_ID = \""+attributeRelationship.get_idAttribute()+"\"").get(0).getName()) + (", "))); //$E
+					conceptFragmentList.add(ConceptFragment.newInstance((daoAttribute.listAttribute("_ID = \""+attributeRelationship.get_idAttribute()+"\"").get(0)), getProjectFromQuestionSet(viewQuestionSet), this, viewQuestionSet)); //$A
+				}//$A
+			}//$A
 			if ((question.getAnswer()) == ("")) {
 			}
 			daoQuestion.insertQuestion(question, false);
 			viewQuestionSet.setAnswerDate(currentDate); //$E
 			daoQuestionSet.editQuestionSet(viewQuestionSet, false); //$E
-			asksQuestionView.asksQuestionSucceeds();
+			asksQuestionView.asksQuestionSucceeds(conceptFragmentList, questionTitle);
 		} catch (ConstraintCheckingException e) {
 			try {
 				this.undo();
@@ -94,6 +116,7 @@ public class AsksQuestionController implements Command {
 				this.undo();
 			} catch (Exception e1) {
 			}
+			e.printStackTrace();
 			asksQuestionView.asksQuestionFails(e.getMessage());
 		}
 	}
@@ -106,6 +129,17 @@ public class AsksQuestionController implements Command {
 			return new ArrayList<QuestionSet>();
 		}
 	}
+	public List<QuestionFragment> getQuestions(QuestionSet questionSet){//$A
+		try {//$A
+			List<QuestionFragment> questionFragments = new ArrayList<>();//$A
+			for (Question question: daoQuestion.listQuestion("QUESTIONSET_ID = \""+questionSet.get_Id()+"\"")) {//$A
+				questionFragments.add(QuestionFragment.newInstance(question.getTitle(), question.getAnswer()));//$A
+			}//$A
+			return questionFragments;//$A
+		} catch (StorageException e) {//$A
+			return null;//$A
+		}//$A
+	}//$A
 	public Project getProjectFromQuestionSet(QuestionSet questionSet) {//$A
 		try {//$A
 			return daoProject.listProject("_ID = \"" + questionSet.get_idProject()+"\"").get(0);//$A

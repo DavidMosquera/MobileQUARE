@@ -85,11 +85,12 @@ public class AnalystHelpView extends AppCompatActivity {
 	public void analystProvidesDiscourseAlert(View view) {
 		helpAlert = new AlertDialog.Builder(this)
 				.setMessage("In order to execute Analyst Provides Discourse, follow the next steps: \n"
-						+ "- Select a/an Project from the list. \n" + "- Insert a/an Discourse.Content (String). \n"
-						+ "- Press the button Provide. \n" + "- The Actor will be inserted. \n"
-						+ "- The Object will be inserted. \n" + "- The Function will be inserted. \n"
-						+ "- The ContainerConcept will be inserted. \n" + "- The Attribute will be inserted. \n"
-						+ "- The AttributeRelationship will be inserted. \n" + "- The Discourse will be inserted. \n")
+						+ "- Select a/an Project from the list. \n" + "- Insert a/an Discourse.Content (PDF file). \n" //$E
+						+ "- Press the button Provide. \n"  + "- The Discourse will be inserted. \n")
+						//$D"- The Actor will be inserted. \n"
+						//$D+ "- The Object will be inserted. \n" + "- The Function will be inserted. \n"
+						//$D+ "- The ContainerConcept will be inserted. \n" + "- The Attribute will be inserted. \n"
+						//$D+ "- The AttributeRelationship will be inserted. \n"
 				.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						showHelpAlertOkay();
@@ -101,8 +102,14 @@ public class AnalystHelpView extends AppCompatActivity {
 		helpAlert = new AlertDialog.Builder(this)
 				.setMessage("In order to execute Analyst Asks Question, follow the next steps: \n"
 						+ "- Select a/an QuestionSet from the list. \n"
-						+ "- Select a/an Question.Type from the list. \n" + "- Press the button Ask. \n"
-						+ "- The Question will be inserted. \n" + "- The QuestionSet will be edited. \n")
+						+ "- Press the button Ask. \n" //$E
+						+ "- A project will be shown in screen. \n" //$A
+						+ "- Press the button Ask below the project. \n"//$A
+						+ "- Select the question that you like to ask. \n"//$A
+						+ "- Press the button Ask at in the alert dialog. \n"//$A
+						+ "- A set of concepts, actors, or functions will be shown with an Ask button below. \n" //$A
+						+ "- Continue asking pressing the Ask button. \n" //$A
+						+ "- The questions will be inserted. \n") //$E
 				.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						showHelpAlertOkay();

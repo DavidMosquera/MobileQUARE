@@ -7,6 +7,7 @@ import android.mobilequare.analyst.model.po.Actor;//$A
 import android.mobilequare.analyst.model.po.Concept;//$A
 import android.mobilequare.analyst.model.po.Function;//$A
 import android.mobilequare.analyst.model.po.Project;//$A
+import android.mobilequare.analyst.model.po.QuestionSet;//$A
 import android.mobilequare.analyst.view.AsksQuestionView;//$A
 import android.os.Bundle;//$A
 import android.view.LayoutInflater;//$A
@@ -16,6 +17,7 @@ import android.widget.Button;//$A
 import android.widget.ImageView;//$A
 import android.widget.TextView;//$A
 import androidx.fragment.app.Fragment;//$A
+import java.util.List;//$A
 public class ConceptFragment extends Fragment {//$A
     private Concept concept;//$A
     private Function function;//$A
@@ -26,16 +28,19 @@ public class ConceptFragment extends Fragment {//$A
     private AlertDialog askDialog;//$A
     private int selected;//$A
     private AsksQuestionController asksQuestionController; //$A
+    private QuestionSet questionSet;//$A
+    private String questionTitle; //$A
     public ConceptFragment() {//$A
     }//$A
-    public static ConceptFragment newInstance(Project project, AsksQuestionController asksQuestionController){//$A
+    public static ConceptFragment newInstance(Project project, QuestionSet questionSet, AsksQuestionController asksQuestionController){//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setType(0);//$A
         fragment.setAsksQuestionController(asksQuestionController); //$A
         fragment.setProject(project);//$A
+        fragment.setQuestionSet(questionSet); //$A
         return fragment;//$A
     }//$A
-    public static ConceptFragment newInstance(Function function, Actor actor , android.mobilequare.analyst.model.po.Object object, Project project, AsksQuestionController asksQuestionController){//$A
+    public static ConceptFragment newInstance(Function function, Actor actor , android.mobilequare.analyst.model.po.Object object, Project project, AsksQuestionController asksQuestionController, QuestionSet questionSet){//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setFunction(function);//$A
         fragment.setAsksQuestionController(asksQuestionController); //$A
@@ -43,22 +48,25 @@ public class ConceptFragment extends Fragment {//$A
         fragment.setProject(project);//$A
         fragment.setActor(actor);//$A
         fragment.setObject(object);//$A
+        fragment.setQuestionSet(questionSet); //$A
         return fragment;//$A
     }//$A
-    public static ConceptFragment newInstance(Function function, Project project, AsksQuestionController asksQuestionController){//$A
+    public static ConceptFragment newInstance(Function function, Project project, AsksQuestionController asksQuestionController, QuestionSet questionSet){//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setFunction(function);//$A
         fragment.setType(1);//$A
         fragment.setAsksQuestionController(asksQuestionController); //$A
         fragment.setProject(project);//$A
+        fragment.setQuestionSet(questionSet); //$A
         return fragment;//$A
     }//$A
-    public static ConceptFragment newInstance(Concept concept, Project project, AsksQuestionController asksQuestionController) {//$A
+    public static ConceptFragment newInstance(Concept concept, Project project, AsksQuestionController asksQuestionController, QuestionSet questionSet) {//$A
         ConceptFragment fragment = new ConceptFragment();//$A
         fragment.setConcept(concept);//$A
         fragment.setType(2);//$A
         fragment.setAsksQuestionController(asksQuestionController); //$A
         fragment.setProject(project);//$A
+        fragment.setQuestionSet(questionSet); //$A
         return fragment;//$A
     }//$A
     @Override//$A
@@ -100,6 +108,7 @@ public class ConceptFragment extends Fragment {//$A
     public void setType(int type){//$A
         this.type = type;//$A
     }//$A
+    public void setQuestionSet (QuestionSet questionSet){this.questionSet = questionSet;}//$A
     public void setProject(Project project){//$A
         this.project = project;//$A
     }//$A
@@ -107,12 +116,13 @@ public class ConceptFragment extends Fragment {//$A
     public void askConfirm(){//$A
         askDialog.cancel();//$A
         String questionType = "";//$A
+        boolean actor = false; //$A
         if(this.selected != -1) {//$A
             if (this.type == 0){ if (this.selected == 0) questionType = "Which are the project's discourse concepts?"; else questionType = "Which are the project's discourse actors?";}//$A
-            else if(this.type == 1){if (this.selected == 0 || this.selected == 1) questionType = "Which are the X's attributes?"; else questionType = "Which are the X's functions?";}//$A
+            else if(this.type == 1){if (this.selected == 0){ actor = true; questionType = "Which are the X's attributes?";} else if (this.selected == 1){ questionType = "Which are the X's attributes?";} else{ questionType = "Which are the X's functions?";}}//$A
             else{if(this.selected == 0) questionType = "Which are the X's attributes?"; else questionType = "Which are the X's functions?";}//$A
+            if(this.type == 1){ if (actor) asksQuestionController.asksQuestion(((AsksQuestionView) getActivity()), questionSet, questionType, this.actor, questionTitle); else asksQuestionController.asksQuestion(((AsksQuestionView) getActivity()), questionSet, questionType, this.object, questionTitle); }else{ asksQuestionController.asksQuestion(((AsksQuestionView) getActivity()), questionSet, questionType, this.concept, questionTitle); } //$A
         }//$A
-        this.asksQuestionController.asksQuestion(((AsksQuestionView) getActivity()), questionType, concept, function, object);System.out.println(questionType);//$A
     }//$A
     public void askCancel(){//$A
         askDialog.cancel();//$A
@@ -131,6 +141,7 @@ public class ConceptFragment extends Fragment {//$A
             @Override//$A
             public void onClick(DialogInterface dialog, int which) {//$A
                 selected = which;//$A
+                questionTitle = items[which].toString();//$A
             }//$A
         }).setPositiveButton("Ask", new DialogInterface.OnClickListener() {//$A
             @Override//$A

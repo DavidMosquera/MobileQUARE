@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -90,20 +91,34 @@ public class AsksQuestionView extends AppCompatActivity {
 		//%D}
 		if(questionSetListFragment.getClassConceptValue()!=null){//$A
 			List<ConceptFragment> conceptFragmentList = new ArrayList<>();//$A
-			conceptFragmentList.add(ConceptFragment.newInstance(asksQuestionController.getProjectFromQuestionSet(((QuestionSet) questionSetListFragment.getClassConceptValue())), asksQuestionController));//$A
+			conceptFragmentList.add(ConceptFragment.newInstance(asksQuestionController.getProjectFromQuestionSet(((QuestionSet) questionSetListFragment.getClassConceptValue())), ((QuestionSet) questionSetListFragment.getClassConceptValue()), asksQuestionController));//$A
+			for(QuestionFragment questionFragment : asksQuestionController.getQuestions(((QuestionSet) questionSetListFragment.getClassConceptValue()))){//$A
+				getSupportFragmentManager().beginTransaction().add(((LinearLayout) findViewById(R.id.asks_question_fragment_linear_layout)).getId(), questionFragment).commit(); //$A
+			}//$A
 			getSupportFragmentManager().beginTransaction().add(((LinearLayout) findViewById(R.id.asks_question_fragment_linear_layout)).getId(), QuestionFragment.newInstance(conceptFragmentList, "Related project to the selected question set")).commit(); //$A
 			findViewById(R.id.asks_question_button).setEnabled(false);//$A
+			this.setScrollDown(); //$A
 		}else{//$A
 			Toast.makeText(this, "Select a question set...", Toast.LENGTH_SHORT).show();//$A
 		}//$A
 	}
-	public void asksQuestionSucceeds() {
+	public void setScrollDown(){//$A
+		((ScrollView) findViewById(R.id.scroll_question)).postDelayed(new Runnable() {//$A
+			@Override//$A
+			public void run() {//$A
+				((ScrollView) findViewById(R.id.scroll_question)).fullScroll(View.FOCUS_DOWN);//$A
+			}//$A
+		},500); //$A
+	}//$A
+	public void asksQuestionSucceeds(List<ConceptFragment> conceptFragmentList, String questionTitle) {
 		//BEHAVIOR WHEN "ANALYST ASKS QUESTION" SUCCEEDS
-		finish();
-		if (analystConfigurationController.getAnalystConfiguration().getAsksQuestionUndoRedoNotification()) {
-			UndoAnalystEventNotification.getInstance(this).setCommand(asksQuestionController);
-			UndoAnalystEventNotification.getInstance(this).create("MobileQUARE", "Question successfully Asked", this);
-		}
+		getSupportFragmentManager().beginTransaction().add(((LinearLayout) findViewById(R.id.asks_question_fragment_linear_layout)).getId(), QuestionFragment.newInstance(conceptFragmentList, questionTitle)).commit();//$A
+		this.setScrollDown(); //$A
+		//$Dfinish();
+		//$Dif (analystConfigurationController.getAnalystConfiguration().getAsksQuestionUndoRedoNotification()) {
+		//$D	UndoAnalystEventNotification.getInstance(this).setCommand(asksQuestionController);
+		//$D	UndoAnalystEventNotification.getInstance(this).create("MobileQUARE", "Question successfully Asked", this);
+		//$D}
 	}
 	public void closeAsksFailsAlert() {
 		asksFailsAlert.cancel();
@@ -126,8 +141,8 @@ public class AsksQuestionView extends AppCompatActivity {
 	}
 	public void asksQuestionConfirm() {
 		asksAlert.cancel();
-		asksQuestionController.asksQuestion(this, ((QuestionSet) questionSetListFragment.getClassConceptValue()),
-				questionTypeInsertFragment.getValue(), null, null, null); //$E
+		//#DasksQuestionController.asksQuestion(this, ((QuestionSet) questionSetListFragment.getClassConceptValue()),
+		//$D		questionTypeInsertFragment.getValue(), null, null, null);
 	}
 	public void asksQuestionCancel() {
 		asksAlert.cancel();
@@ -139,8 +154,14 @@ public class AsksQuestionView extends AppCompatActivity {
 		helpAlert = new AlertDialog.Builder(this)
 				.setMessage("In order to execute Analyst Asks Question, follow the next steps: \n"
 						+ "- Select a/an QuestionSet from the list. \n"
-						+ "- Select a/an Question.Type from the list. \n" + "- Press the button Ask. \n"
-						+ "- The Question will be inserted. \n" + "- The QuestionSet will be edited. \n")
+						+ "- Press the button Ask. \n" //$E
+						+ "- A project will be shown in screen. \n" //$A
+						+ "- Press the button Ask below the project. \n"//$A
+						+ "- Select the question that you like to ask. \n"//$A
+						+ "- Press the button Ask at in the alert dialog. \n"//$A
+						+ "- A set of concepts, actors, or functions will be shown with an Ask button below. \n" //$A
+						+ "- Continue asking pressing the Ask button. \n" //$A
+						+ "- The questions will be inserted. \n") //$E
 				.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						showHelpAlertOkay();

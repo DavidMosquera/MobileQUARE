@@ -49,4 +49,10 @@ public class Project extends ClassConcept {
 	public void setQuestionSetList(List<QuestionSet> newQuestionSetList) {
 		this.questionSetList = newQuestionSetList;
 	}
+	public String toString() {//$A
+		return this.name;//$A
+	}//$A
+	public String listInfo() {//$A
+		return " " +this.name + " \n Description: "+ this.description;//$A
+	}//$A
 }

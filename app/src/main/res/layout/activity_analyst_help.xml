@@ -25,36 +25,30 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:orientation="vertical">
-            
 			<Button
                 android:id="@+id/analyst_create_project_help_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystCreatesProjectAlert"
                 android:text="Create Project" />
-			
 			<Button
                 android:id="@+id/analyst_establish_questionset_help_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystEstablishesQuestionSetAlert"
                 android:text="Establish QuestionSet" />
-			
 			<Button
                 android:id="@+id/analyst_provide_discourse_help_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystProvidesDiscourseAlert"
                 android:text="Provide Discourse" />
-			
 			<Button
                 android:id="@+id/analyst_ask_question_help_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystAsksQuestionAlert"
                 android:text="Ask Question" />
-			
-            
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,6 +15,7 @@ public class Object extends Concept {
 		this.setName(concept.getName());//$A
 		this.setIdentification(concept.getIdentification());//$A
 		this.set_idDiscourse(concept.get_idDiscourse());//$A
+		this.set_Id(concept.get_Id());//$A
 	}//$A
 	public Object() {
 		super();

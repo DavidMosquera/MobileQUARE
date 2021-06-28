@@ -21,7 +21,7 @@ public class QuestionFragment extends Fragment {//$A
     }//$A
     public static QuestionFragment newInstance(String title, String answer) {//$A
         QuestionFragment fragment = new QuestionFragment();//$A
-        fragment.setAnswer(answer);//$A
+        fragment.setAnswer(answer.compareTo("")==0 ? "None" : answer);//$A
         fragment.setTitle(title);//$A
         return fragment;//$A
     }//$A
@@ -40,7 +40,7 @@ public class QuestionFragment extends Fragment {//$A
             if(this.conceptFragmentList != null) {//$A
                 if (this.conceptFragmentList.size() == 0)//$A
                     rootView.findViewById(R.id.none_answer_text_view).setVisibility(View.VISIBLE);//$A
-                else {
+                else {//$A
                     LinearLayout linearLayout = rootView.findViewById(R.id.concept_function_fragment_linear_layout);//$A
                     for (ConceptFragment conceptFragment : this.conceptFragmentList) {//$A
                         getChildFragmentManager().beginTransaction().add(linearLayout.getId(), conceptFragment).commit();//$A

@@ -25,35 +25,30 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:orientation="vertical">
-        	
 			<Button
                 android:id="@+id/analyst_create_project_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystCreatesProjectTransition"
                 android:text="Create Project"/>
-			
 			<Button
                 android:id="@+id/analyst_establish_questionset_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystEstablishesQuestionSetTransition"
                 android:text="Establish QuestionSet"/>
-			
 			<Button
                 android:id="@+id/analyst_provide_discourse_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystProvidesDiscourseTransition"
                 android:text="Provide Discourse"/>
-			
 			<Button
                 android:id="@+id/analyst_ask_question_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="analystAsksQuestionTransition"
                 android:text="Ask Question"/>
-			
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
